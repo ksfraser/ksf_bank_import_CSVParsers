@@ -1,0 +1,11 @@
+{
+  "name": "WMMC CSV Parser",
+  "description": "Parses Walmart MasterCard CSV credit card statements.",
+  "namespace": "Parsers\\ro_wmmc_csv",
+  "class": "ro_wmmc_csv_parser",
+  "filetype": ["csv"],
+  "author": "Kevin Fraser",
+  "version": "1.0.0",
+  "packagist": "ksfraser/ro-wmmc-csv-parser",
+  "enabled": false
+}
