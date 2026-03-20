@@ -1,0 +1,22 @@
+{
+    "name": "ksf-bank-import/csv-parsers",
+    "description": "Generic CSV Parser for Bank Statement Imports",
+    "type": "library",
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "Parsers\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Parsers\\Tests\\": "tests/"
+        }
+    },
+    "require": {
+        "php": ">=7.3"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^9.5"
+    }
+}

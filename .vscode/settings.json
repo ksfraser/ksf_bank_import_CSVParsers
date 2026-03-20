@@ -1,0 +1,8 @@
+{
+    "phpunit.phpunit": "vendor/bin/phpunit",
+    "phpunit.args": [
+        "--configuration",
+        "phpunit.xml"
+    ],
+    "php.validate.executablePath": "php"
+}

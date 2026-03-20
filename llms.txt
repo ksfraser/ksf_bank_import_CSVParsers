@@ -1,0 +1,15 @@
+# WMMC CSV Parser
+
+A PHP 7.3+ parser for Walmart MasterCard (WMMC) credit card statements, following the bank-import plugin architecture.
+
+- [AGENTS.md](AGENTS.md): Technical requirements, architecture principles, and quality standards for the repository.
+- [Project_Architecture_Blueprint.md](Project_Architecture_Blueprint.md): Detailed architectural design and component overview.
+- [README.md](README.md): High-level project information and basic usage.
+- [parser.json](parser.json): Metadata defining the parser's configuration and namespace.
+- [ro_wmmc_csv_parser.php](ro_wmmc_csv_parser.php): Core implementation of the parser logic.
+
+## Specifications
+
+- Input: CSV content with varying header formats (2023-2024).
+- Core types: `statement`, `transaction`, and `parser` (externally provided).
+- Architecture: Plugin system with dynamic discovery via JSON metadata.
