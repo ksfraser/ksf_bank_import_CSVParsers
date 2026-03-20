@@ -1,6 +1,6 @@
 <?php
 /**
- * Tests for OFX-aligned entities: BankAccount, Payee, Currency, Balance.
+ * Tests for OFX-aligned entities: BankAccount, ContactData (via ksfraser/contact-dto), Currency, Balance.
  * Also tests Transaction::payeeData JSON round-trip and Statement new properties.
  *
  * @requirement REQ-003: Entity mapping to core bank import structures
@@ -11,7 +11,7 @@ namespace Parsers\Tests\Entities;
 
 use PHPUnit\Framework\TestCase;
 use Parsers\Entities\BankAccount;
-use Parsers\Entities\Payee;
+use Ksfraser\Contact\DTO\ContactData;
 use Parsers\Entities\Currency;
 use Parsers\Entities\Balance;
 use Parsers\Entities\Transaction;
@@ -82,98 +82,85 @@ class OfxEntityTest extends TestCase
     }
 
     // ──────────────────────────────────────────────
-    // Payee
+    // ContactData (ksfraser/contact-dto)
     // ──────────────────────────────────────────────
 
-    public function testPayeeCreation()
+    public function testContactDataCreation()
     {
-        $payee = new Payee([
-            'name'       => 'WAL-MART #1050',
-            'city'       => 'AIRDRIE',
-            'state'      => 'AB',
-            'country'    => 'CAN',
-            'postalCode' => 'T4B 3G5',
-            'category'   => 'Grocery Stores and Supermarkets',
+        $contact = new ContactData();
+        $contact->fromArray([
+            'name'           => 'WAL-MART #1050',
+            'city'           => 'AIRDRIE',
+            'state_province' => 'AB',
+            'country'        => 'CAN',
+            'postal_code'    => 'T4B 3G5',
+            'tags'           => 'Grocery Stores and Supermarkets',
         ]);
 
-        $this->assertEquals('WAL-MART #1050', $payee->name);
-        $this->assertEquals('AIRDRIE', $payee->city);
-        $this->assertEquals('AB', $payee->state);
-        $this->assertEquals('CAN', $payee->country);
-        $this->assertEquals('T4B 3G5', $payee->postalCode);
-        $this->assertEquals('Grocery Stores and Supermarkets', $payee->category);
-        $this->assertNull($payee->phone);
-        $this->assertNull($payee->address1);
+        $this->assertEquals('WAL-MART #1050', $contact->name);
+        $this->assertEquals('AIRDRIE', $contact->city);
+        $this->assertEquals('AB', $contact->state_province);
+        $this->assertEquals('CAN', $contact->country);
+        $this->assertEquals('T4B 3G5', $contact->postal_code);
+        $this->assertEquals('Grocery Stores and Supermarkets', $contact->tags);
+        $this->assertEquals('', $contact->phone);
+        $this->assertEquals('', $contact->address_line_1);
     }
 
-    public function testPayeeAddressString()
+    public function testContactDataFullAddress()
     {
-        $full = new Payee([
-            'city'       => 'AIRDRIE',
-            'state'      => 'AB',
-            'country'    => 'CAN',
-            'postalCode' => 'T4B 3G5',
+        $full = new ContactData();
+        $full->fromArray([
+            'address_line_1' => '123 Main St',
+            'city'           => 'AIRDRIE',
+            'state_province' => 'AB',
+            'postal_code'    => 'T4B 3G5',
+            'country'        => 'CAN',
         ]);
-        $this->assertEquals('AIRDRIE, AB, CAN, T4B 3G5', $full->getAddressString());
+        $this->assertNotEmpty($full->getFullAddress());
 
-        $partial = new Payee(['city' => 'CALGARY']);
-        $this->assertEquals('CALGARY', $partial->getAddressString());
-
-        $empty = new Payee();
-        $this->assertEquals('', $empty->getAddressString());
+        $empty = new ContactData();
+        $this->assertEquals('', $empty->getFullAddress());
     }
 
-    public function testPayeeHasAddress()
+    public function testContactDataToArrayRoundTrip()
     {
-        $withAddr = new Payee(['city' => 'AIRDRIE']);
-        $this->assertTrue($withAddr->hasAddress());
-
-        $noAddr = new Payee(['name' => 'PAYMENT - THANK YOU']);
-        $this->assertFalse($noAddr->hasAddress());
-    }
-
-    public function testPayeeToArrayOmitsNulls()
-    {
-        $payee = new Payee([
+        $contact = new ContactData();
+        $contact->fromArray([
             'name' => 'TestMerchant',
             'city' => 'TestCity',
         ]);
-        $arr = $payee->toArray();
+        $arr = $contact->toArray();
 
-        $this->assertCount(2, $arr);
+        $this->assertArrayHasKey('name', $arr);
+        $this->assertArrayHasKey('city', $arr);
         $this->assertEquals('TestMerchant', $arr['name']);
         $this->assertEquals('TestCity', $arr['city']);
-        $this->assertArrayNotHasKey('state', $arr);
     }
 
-    public function testPayeeJsonRoundTrip()
+    public function testContactDataJsonRoundTrip()
     {
-        $original = new Payee([
-            'name'       => 'WAL-MART #1050',
-            'city'       => 'AIRDRIE',
-            'state'      => 'AB',
-            'country'    => 'CAN',
-            'postalCode' => 'T4B 3G5',
-            'category'   => 'Grocery Stores and Supermarkets',
+        $original = new ContactData();
+        $original->fromArray([
+            'name'           => 'WAL-MART #1050',
+            'city'           => 'AIRDRIE',
+            'state_province' => 'AB',
+            'country'        => 'CAN',
+            'postal_code'    => 'T4B 3G5',
+            'tags'           => 'Grocery Stores and Supermarkets',
         ]);
 
-        $json = $original->toJson();
+        $json = json_encode($original->toArray(), JSON_UNESCAPED_UNICODE);
         $this->assertJson($json);
 
-        $decoded = Payee::fromJson($json);
+        $decoded = new ContactData();
+        $decoded->fromArray(json_decode($json, true));
         $this->assertEquals('WAL-MART #1050', $decoded->name);
         $this->assertEquals('AIRDRIE', $decoded->city);
-        $this->assertEquals('AB', $decoded->state);
+        $this->assertEquals('AB', $decoded->state_province);
         $this->assertEquals('CAN', $decoded->country);
-        $this->assertEquals('T4B 3G5', $decoded->postalCode);
-        $this->assertEquals('Grocery Stores and Supermarkets', $decoded->category);
-    }
-
-    public function testPayeeFromJsonWithInvalidInput()
-    {
-        $payee = Payee::fromJson('not-json');
-        $this->assertNull($payee->name);
-        $this->assertFalse($payee->hasAddress());
+        $this->assertEquals('T4B 3G5', $decoded->postal_code);
+        $this->assertEquals('Grocery Stores and Supermarkets', $decoded->tags);
     }
 
     // ──────────────────────────────────────────────
@@ -251,13 +238,14 @@ class OfxEntityTest extends TestCase
     {
         $tx = new Transaction(['date' => '2026-01-01', 'amount' => -94.59]);
 
-        $payee = new Payee([
+        $contact = new ContactData();
+        $contact->fromArray([
             'name' => 'WAL-MART #1050',
             'city' => 'AIRDRIE',
-            'state' => 'AB',
+            'state_province' => 'AB',
         ]);
 
-        $tx->setPayee($payee);
+        $tx->setPayee($contact);
 
         $this->assertNotNull($tx->payeeData);
         $this->assertJson($tx->payeeData);
@@ -268,8 +256,9 @@ class OfxEntityTest extends TestCase
     {
         $tx = new Transaction(['date' => '2026-01-01', 'payee' => 'EXISTING PAYEE']);
 
-        $payee = new Payee(['name' => 'NEW NAME']);
-        $tx->setPayee($payee);
+        $contact = new ContactData();
+        $contact->fromArray(['name' => 'NEW NAME']);
+        $tx->setPayee($contact);
 
         $this->assertEquals('EXISTING PAYEE', $tx->payee);
         $this->assertNotNull($tx->payeeData);
@@ -278,22 +267,23 @@ class OfxEntityTest extends TestCase
     public function testTransactionGetPayeeRoundTrip()
     {
         $tx = new Transaction();
-        $original = new Payee([
-            'name'       => 'WAL-MART #1050',
-            'city'       => 'AIRDRIE',
-            'state'      => 'AB',
-            'country'    => 'CAN',
-            'postalCode' => 'T4B 3G5',
-            'category'   => 'Grocery Stores and Supermarkets',
+        $original = new ContactData();
+        $original->fromArray([
+            'name'           => 'WAL-MART #1050',
+            'city'           => 'AIRDRIE',
+            'state_province' => 'AB',
+            'country'        => 'CAN',
+            'postal_code'    => 'T4B 3G5',
+            'tags'           => 'Grocery Stores and Supermarkets',
         ]);
 
         $tx->setPayee($original);
 
         $retrieved = $tx->getPayee();
-        $this->assertInstanceOf(Payee::class, $retrieved);
+        $this->assertInstanceOf(ContactData::class, $retrieved);
         $this->assertEquals('WAL-MART #1050', $retrieved->name);
         $this->assertEquals('AIRDRIE', $retrieved->city);
-        $this->assertEquals('Grocery Stores and Supermarkets', $retrieved->category);
+        $this->assertEquals('Grocery Stores and Supermarkets', $retrieved->tags);
     }
 
     public function testTransactionGetPayeeReturnsNullWhenEmpty()
@@ -302,9 +292,17 @@ class OfxEntityTest extends TestCase
         $this->assertNull($tx->getPayee());
     }
 
+    public function testTransactionGetPayeeReturnsNullForInvalidJson()
+    {
+        $tx = new Transaction(['payeeData' => 'not-json']);
+        $this->assertNull($tx->getPayee());
+    }
+
     public function testTransactionPayeeDataViaConstructor()
     {
-        $payeeJson = json_encode(['name' => 'Test', 'city' => 'Calgary']);
+        $contact = new ContactData();
+        $contact->fromArray(['name' => 'Test', 'city' => 'Calgary']);
+        $payeeJson = json_encode($contact->toArray(), JSON_UNESCAPED_UNICODE);
         $tx = new Transaction(['payeeData' => $payeeJson]);
 
         $this->assertEquals($payeeJson, $tx->payeeData);

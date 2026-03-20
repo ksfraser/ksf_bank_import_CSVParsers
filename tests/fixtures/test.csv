@@ -1,0 +1,19 @@
+Date,"Posted Date","Reference number","Activity Type",Status,"Card number","Merchant Category","Merchant name","Merchant city","Merchant State or Province","Merchant country","Merchant postal code",Amount,Rewards,"Name on Card"
+2023-04-16,2023-04-18,"XXXXXXXXXXNUM""",TRANS,APPROVED,Account93,"Grocery Stores and Supermarkets",Merchant18,City1,AB,CAN,"Z9Z 9Z9",$37.73,,Person1
+2023-04-16,2023-04-18,"XXXXXXXXXXNUM""",TRANS,APPROVED,Account93,"Grocery Stores and Supermarkets",Merchant727,City1,AB,CAN,"Z9Z 9Z9",$13.68,,Person1
+2023-04-15,2023-04-17,"XXXXXXXXXXNUM""",TRANS,APPROVED,Account93,"Quick Payment Service-Fast Food Restaurants",Merchant728,City2,AB,CAN,"Z9Z 9Z9",$19.93,,Person1
+2023-04-13,2023-04-17,"XXXXXXXXXXNUM""",TRANS,APPROVED,Account93,"Grocery Stores and Supermarkets",Merchant18,City1,AB,CAN,"Z9Z 9Z9",$81.43,,Person1
+2023-04-12,2023-04-13,"XXXXXXXXXXNUM""",TRANS,APPROVED,Account93,"Wholesale Club with or without membership fee ",Merchant729,City3,AB,CAN,"Z9Z 9Z9",$6.81,,Person1
+2023-04-10,2023-04-11,"XXXXXXXXXXNUM""",TRANS,APPROVED,Account93,,Merchant17,,,,,-$340.63,,Person1
+2023-04-09,2023-04-10,"XXXXXXXXXXNUM""",TRANS,APPROVED,Account93,"Quick Payment Service-Fast Food Restaurants",Merchant730,City1,AB,CAN,"Z9Z 9Z9",$24.03,,Person1
+2023-04-09,2023-04-10,"XXXXXXXXXXNUM""",TRANS,APPROVED,Account93,"Quick Payment Service-Fast Food Restaurants",Merchant730,City1,AB,CAN,"Z9Z 9Z9",$2.82,,Person1
+2023-04-07,2023-04-10,"XXXXXXXXXXNUM""",TRANS,APPROVED,Account93,"Grocery Stores and Supermarkets",Merchant18,City1,AB,CAN,"Z9Z 9Z9",$117.07,,Person1
+2023-04-04,2023-04-06,"XXXXXXXXXXNUM""",TRANS,APPROVED,Account93,"Grocery Stores and Supermarkets",Merchant18,City1,AB,CAN,"Z9Z 9Z9",$50.49,,Person1
+2023-04-01,2023-04-03,"XXXXXXXXXXNUM""",TRANS,APPROVED,Account93,"Grocery Stores and Supermarkets",Merchant18,City1,AB,CAN,"Z9Z 9Z9",$87.23,,Person1
+2023-03-26,2023-03-28,"XXXXXXXXXXNUM""",TRANS,APPROVED,Account93,"Grocery Stores and Supermarkets",Merchant18,City1,AB,CAN,"Z9Z 9Z9",$131.35,,Person1
+2023-03-24,2023-03-27,"XXXXXXXXXXNUM""",TRANS,APPROVED,Account93,"Eating Places and Restaurants",Merchant731,City1,AB,CAN,"Z9Z 9Z9",$69.39,,Person1
+2023-03-21,2023-03-23,"XXXXXXXXXXNUM""",TRANS,APPROVED,Account93,"Grocery Stores and Supermarkets",Merchant18,City1,AB,CAN,"Z9Z 9Z9",$60.17,,Person1
+2023-03-18,2023-03-21,"XXXXXXXXXXNUM""",TRANS,APPROVED,Account93,"Grocery Stores and Supermarkets",Merchant18,City1,AB,CAN,"Z9Z 9Z9",-$5.97,,Person1
+2023-03-18,2023-03-21,"XXXXXXXXXXNUM""",TRANS,APPROVED,Account93,"Grocery Stores and Supermarkets",Merchant18,City1,AB,CAN,"Z9Z 9Z9",$15.59,,Person1
+2023-03-17,2023-03-21,"XXXXXXXXXXNUM""",TRANS,APPROVED,Account93,"Grocery Stores and Supermarkets",Merchant18,City1,AB,CAN,"Z9Z 9Z9",$61.69,,Person1
+

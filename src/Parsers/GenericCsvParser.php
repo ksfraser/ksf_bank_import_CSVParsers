@@ -13,7 +13,7 @@ namespace Parsers\Parsers;
 use Parsers\Entities\Statement;
 use Parsers\Entities\Transaction;
 use Parsers\Entities\BankAccount;
-use Parsers\Entities\Payee;
+use Ksfraser\Contact\DTO\ContactData;
 
 abstract class GenericCsvParser
 {
@@ -148,16 +148,18 @@ abstract class GenericCsvParser
     {
         $txData = [];
         $addressParts = [];
-        $payeeFields = [];
+        $contactFields = [];
         foreach ($this->columnMap as $index => $property) {
             if (isset($data[$index])) {
                 $value = $this->formatValue($data[$index], $property);
                 
-                // Collect address components for Payee entity and consolidated memo
+                // Collect address components for ContactData and consolidated memo
                 if (in_array($property, ['city', 'state', 'country', 'postalCode'])) {
                     if (!empty($value)) {
                         $addressParts[] = $value;
-                        $payeeFields[$property] = $value;
+                        // Map CSV field names to ContactData property names
+                        $dtoKey = $this->mapToContactField($property);
+                        $contactFields[$dtoKey] = $value;
                     }
                     continue;
                 }
@@ -179,16 +181,17 @@ abstract class GenericCsvParser
             $txData['memo'] = !empty($existingMemo) ? $existingMemo . ' | ' . $addressStr : $addressStr;
         }
 
-        // Build structured Payee and serialize to payeeData JSON
+        // Build structured ContactData and serialize to payeeData JSON
         $payeeName = isset($txData['payee']) ? $txData['payee'] : null;
         $payeeCategory = isset($txData['category']) ? $txData['category'] : null;
-        if ($payeeName !== null || !empty($payeeFields)) {
-            $payeeFields['name'] = $payeeName;
+        if ($payeeName !== null || !empty($contactFields)) {
+            $contactFields['name'] = $payeeName !== null ? $payeeName : '';
             if ($payeeCategory !== null) {
-                $payeeFields['category'] = $payeeCategory;
+                $contactFields['tags'] = $payeeCategory;
             }
-            $payee = new Payee($payeeFields);
-            $txData['payeeData'] = $payee->toJson();
+            $contact = new ContactData();
+            $contact->fromArray($contactFields);
+            $txData['payeeData'] = json_encode($contact->toArray(), JSON_UNESCAPED_UNICODE);
         }
 
         if (empty($txData)) {
@@ -289,5 +292,22 @@ abstract class GenericCsvParser
                 'accountId' => $accountId,
             ]);
         }
+    }
+
+    /**
+     * Map CSV column property names to ContactData DTO field names.
+     *
+     * @param string $csvProperty The CSV-mapped property name (e.g. 'state', 'postalCode')
+     * @return string The corresponding ContactData field name
+     */
+    protected function mapToContactField(string $csvProperty): string
+    {
+        $map = [
+            'state'      => 'state_province',
+            'postalCode' => 'postal_code',
+            'address1'   => 'address_line_1',
+        ];
+
+        return isset($map[$csvProperty]) ? $map[$csvProperty] : $csvProperty;
     }
 }

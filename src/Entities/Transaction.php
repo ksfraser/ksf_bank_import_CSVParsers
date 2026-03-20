@@ -10,6 +10,8 @@
 
 namespace Parsers\Entities;
 
+use Ksfraser\Contact\DTO\ContactData;
+
 class Transaction
 {
     /** @var string|null Date of the transaction (Y-m-d) */
@@ -40,12 +42,12 @@ class Transaction
     public $commodity;
 
     /**
-     * JSON-encoded structured payee/merchant data for downstream use.
-     * Contains Payee entity fields (name, city, state, country, postalCode, category, etc.)
+     * JSON-encoded structured contact/payee data for downstream use.
+     * Contains ContactData DTO fields (name, city, state_province, country, postal_code, tags, etc.)
      * that can be parsed later to create FA suppliers/customers.
      *
      * @var string|null JSON string
-     * @requirement REQ-004: OFX-aligned entity model for Payee
+     * @requirement REQ-004: OFX-aligned entity model using ksfraser/contact-dto
      */
     public $payeeData;
 
@@ -93,29 +95,35 @@ class Transaction
     }
 
     /**
-     * Set structured payee data from a Payee entity.
+     * Set structured payee data from a ContactData DTO.
      * Stores the JSON representation and keeps payee string in sync.
      *
-     * @param Payee $payee
+     * @param ContactData $contact
      */
-    public function setPayee(Payee $payee): void
+    public function setPayee(ContactData $contact): void
     {
-        $this->payeeData = $payee->toJson();
-        if ($payee->name !== null && ($this->payee === null || $this->payee === '')) {
-            $this->payee = $payee->name;
+        $this->payeeData = json_encode($contact->toArray(), JSON_UNESCAPED_UNICODE);
+        if ($contact->name !== '' && ($this->payee === null || $this->payee === '')) {
+            $this->payee = $contact->name;
         }
     }
 
     /**
-     * Reconstruct a Payee entity from the stored JSON payeeData.
+     * Reconstruct a ContactData DTO from the stored JSON payeeData.
      *
-     * @return Payee|null
+     * @return ContactData|null
      */
-    public function getPayee(): ?Payee
+    public function getPayee(): ?ContactData
     {
         if ($this->payeeData === null) {
             return null;
         }
-        return Payee::fromJson($this->payeeData);
+        $data = json_decode($this->payeeData, true);
+        if (!is_array($data)) {
+            return null;
+        }
+        $contact = new ContactData();
+        $contact->fromArray($data);
+        return $contact;
     }
 }

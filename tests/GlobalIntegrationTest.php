@@ -17,7 +17,7 @@ use Parsers\Parsers\RbcCsvParser;
 use Parsers\Parsers\BcrCsvParser;
 use Parsers\Parsers\IngCsvParser;
 use Parsers\Entities\BankAccount;
-use Parsers\Entities\Payee;
+use Ksfraser\Contact\DTO\ContactData;
 
 class GlobalIntegrationTest extends TestCase
 {
@@ -99,14 +99,14 @@ class GlobalIntegrationTest extends TestCase
         $found = false;
         foreach ($statement->getTransactions() as $tx) {
             if ($tx->payeeData !== null) {
-                $payee = $tx->getPayee();
-                $this->assertInstanceOf(Payee::class, $payee);
-                $this->assertNotNull($payee->name);
+                $contact = $tx->getPayee();
+                $this->assertInstanceOf(ContactData::class, $contact);
+                $this->assertNotEmpty($contact->name);
 
-                if ($payee->hasAddress()) {
+                if ($contact->getFullAddress() !== '') {
                     $found = true;
-                    $this->assertNotEmpty($payee->city);
-                    $this->assertNotEmpty($payee->state);
+                    $this->assertNotEmpty($contact->city);
+                    $this->assertNotEmpty($contact->state_province);
                     break;
                 }
             }

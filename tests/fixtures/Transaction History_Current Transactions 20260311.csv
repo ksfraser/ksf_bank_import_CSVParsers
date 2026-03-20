@@ -1,0 +1,4 @@
+"﻿""Date""","Posted Date","Reference Number","Activity Type",Status,"Transaction Card Number","Merchant Category","Merchant Name","Merchant City","Merchant State/Province","Merchant Country","Merchant Postal Code/Zip",Amount,Rewards,"Name on Card"
+2026-03-02,2026-03-03,"XXXXXXXXXXNUM""",TRANS,APPROVED,Account93,,Merchant17,,,,"Z9Z 9Z9",-$300.00,,Person1
+2026-02-22,2026-02-23,"XXXXXXXXXXNUM""",TRANS,APPROVED,Account93,"Grocery Stores and Supermarkets",Merchant18,City1,AB,CAN,"Z9Z 9Z9",$94.59,,Person1
+2026-02-20,2026-02-23,"XXXXXXXXXXNUM""",TRANS,APPROVED,Account93,"Grocery Stores and Supermarkets",Merchant18,City1,AB,CAN,"Z9Z 9Z9",$129.69,,Person1

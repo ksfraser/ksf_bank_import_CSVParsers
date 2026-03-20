@@ -1,8 +1,13 @@
 {
+    "php.validate.executablePath": "php",
+
+    // Devsense PHP Tools test configuration
+    "php.test.configuration": "phpunit.xml",
+
+    // emallin.phpunit settings (kept for backward compat / can be removed if extension is uninstalled)
     "phpunit.phpunit": "vendor/bin/phpunit",
     "phpunit.args": [
         "--configuration",
         "phpunit.xml"
-    ],
-    "php.validate.executablePath": "php"
+    ]
 }
