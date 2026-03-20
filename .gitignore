@@ -1,4 +1,5 @@
 vendor/
+build/
 CSVs/
 *.log
 .DS_Store

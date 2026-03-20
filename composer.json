@@ -14,7 +14,8 @@
         }
     },
     "require": {
-        "php": ">=7.3"
+        "php": ">=7.3",
+        "ksfraser/contact-dto": "^0.1.0"
     },
     "require-dev": {
         "phpunit/phpunit": "^9.5"

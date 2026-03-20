@@ -1,15 +1,42 @@
-# WMMC CSV Parser
+# Bank Import CSV Parsers
 
-A PHP 7.3+ parser for Walmart MasterCard (WMMC) credit card statements, following the bank-import plugin architecture.
+> A PHP library providing a generic CSV parsing engine with bank-specific implementations (WMMC, BCR, ING, RBC) for importing banking and credit card statements into the ksf_bank_import system. Uses a polymorphic parser hierarchy with standardized entity output and ContactData integration via ksfraser/contact-dto.
 
-- [AGENTS.md](AGENTS.md): Technical requirements, architecture principles, and quality standards for the repository.
-- [Project_Architecture_Blueprint.md](Project_Architecture_Blueprint.md): Detailed architectural design and component overview.
-- [README.md](README.md): High-level project information and basic usage.
-- [parser.json](parser.json): Metadata defining the parser's configuration and namespace.
-- [ro_wmmc_csv_parser.php](ro_wmmc_csv_parser.php): Core implementation of the parser logic.
+The library follows PSR-4 autoloading under the `Parsers\` namespace. Each bank parser extends `GenericCsvParser` (abstract base) with minimal overrides for header aliases and column mappings. Payee data is standardized via `\Ksfraser\Contact\DTO\ContactData` from the `ksfraser/contact-dto` package.
 
-## Specifications
+## Documentation
 
-- Input: CSV content with varying header formats (2023-2024).
-- Core types: `statement`, `transaction`, and `parser` (externally provided).
-- Architecture: Plugin system with dynamic discovery via JSON metadata.
+- [README](README.md): Project overview, installation, usage examples, and test coverage
+- [AGENTS.md](AGENTS.md): Technical requirements, coding standards, and development principles
+- [Product Requirements](Project%20Docs/PRD.md): Executive summary, user stories, scope, and risk analysis
+- [Functional Requirements](Project%20Docs/FRD.md): Detailed functional requirements (FR-001 through FR-005)
+- [Architecture Blueprint](Project%20Docs/Project_Architecture_Blueprint.md): Technology stack, component design, class hierarchy, and AGENTS.md compliance
+- [Implementation Plan](Project%20Docs/Implementation_Plan.md): Phased implementation with task completion status
+- [Requirements Traceability Matrix](Project%20Docs/RTM.md): Mapping of requirements to files, functions, and tests
+
+## Core Source
+
+- [GenericCsvParser](src/Parsers/GenericCsvParser.php): Abstract base parser with CSV engine, header detection, column mapping, and mapToContactField()
+- [WmmcCsvParser](src/Parsers/WmmcCsvParser.php): Walmart Mastercard CSV parser
+- [BcrCsvParser](src/Parsers/BcrCsvParser.php): BCR Romania CSV parser
+- [IngCsvParser](src/Parsers/IngCsvParser.php): ING Romania CSV parser
+- [RbcCsvParser](src/Parsers/RbcCsvParser.php): RBC Canada CSV parser
+
+## Entities
+
+- [Transaction](src/Entities/Transaction.php): Transaction entity with ContactData payee (maps to bi_transactions)
+- [Statement](src/Entities/Statement.php): Bank statement entity (maps to bi_statements)
+- [BankAccount](src/Entities/BankAccount.php): OFX-aligned bank account model
+- [Balance](src/Entities/Balance.php): OFX-aligned balance model
+- [Currency](src/Entities/Currency.php): Currency handling
+
+## Configuration
+
+- [composer.json](composer.json): Composer package definition and dependencies (ksfraser/contact-dto ^0.1.0)
+- [parser.json](parser.json): Parser metadata for core bank import system integration
+- [phpunit.xml](phpunit.xml): PHPUnit test configuration with coverage settings
+
+## Optional
+
+- [LICENSE](LICENSE.md): MIT license
+- [Payee (deprecated)](src/Entities/Payee.php): Deprecated stub extending ContactData for backward compatibility
