@@ -6,6 +6,7 @@
  * 
  * @requirement REQ-001: Semi-auto column recognition logic
  * @requirement REQ-003: Entity mapping to core bank import structures
+ * @requirement REQ-004: OFX-aligned entity model
  * @covers-requirement REQ-001
  */
 
@@ -13,6 +14,7 @@ namespace Parsers\Parsers;
 
 use Parsers\Entities\Statement;
 use Parsers\Entities\Transaction;
+use Parsers\Entities\BankAccount;
 
 class WmmcCsvParser extends GenericCsvParser
 {
@@ -56,13 +58,10 @@ class WmmcCsvParser extends GenericCsvParser
      */
     protected function formatAmount($value): float
     {
-        // Strip out anything that is NOT a digit, a decimal point, or a negative sign
-        // This handles cases like "-$300.00" or "$94.59"
         $isNegative = (strpos($value, '-') !== false || (strpos($value, '(') !== false && strpos($value, ')') !== false));
         
         $clean = preg_replace('/[^0-9.]/', '', $value);
 
-        // Handle the case where the amount has extra dots (unlikely but safe)
         if (substr_count($clean, '.') > 1) {
             $parts = explode('.', $clean);
             $decimal = array_pop($parts);
@@ -71,7 +70,21 @@ class WmmcCsvParser extends GenericCsvParser
 
         $val = (float)$clean;
         return $isNegative ? -$val : $val;
-        parent::processRow($data, $statement);
+    }
+
+    /**
+     * WMMC accounts are always credit cards.
+     *
+     * @inheritdoc
+     */
+    protected function populateBankAccount(Statement $statement, string $accountId): void
+    {
+        if ($statement->bankAccount === null) {
+            $statement->bankAccount = new BankAccount([
+                'accountId'   => $accountId,
+                'accountType' => BankAccount::TYPE_CREDITLINE,
+            ]);
+        }
     }
 }
 

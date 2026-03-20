@@ -12,6 +12,8 @@ namespace Parsers\Parsers;
 
 use Parsers\Entities\Statement;
 use Parsers\Entities\Transaction;
+use Parsers\Entities\BankAccount;
+use Parsers\Entities\Currency;
 
 class BcrCsvParser extends GenericCsvParser
 {
@@ -57,12 +59,14 @@ class BcrCsvParser extends GenericCsvParser
                 case 'accountNumber':
                     if (empty($statement->accountNumber)) {
                         $statement->accountNumber = trim($value);
+                        $this->populateBankAccount($statement, trim($value));
                     }
                     $txData['accountNumber'] = trim($value);
                     break;
                 case 'currency':
                     if (empty($statement->currency)) {
                         $statement->currency = trim($value);
+                        $statement->defaultCurrency = new Currency(trim($value));
                     }
                     $txData['commodity'] = trim($value);
                     break;

@@ -16,6 +16,8 @@ use Parsers\Parsers\WmmcCsvParser;
 use Parsers\Parsers\RbcCsvParser;
 use Parsers\Parsers\BcrCsvParser;
 use Parsers\Parsers\IngCsvParser;
+use Parsers\Entities\BankAccount;
+use Parsers\Entities\Payee;
 
 class GlobalIntegrationTest extends TestCase
 {
@@ -70,5 +72,87 @@ class GlobalIntegrationTest extends TestCase
                 }
             }
         }
+    }
+
+    /**
+     * Verify WMMC parser populates BankAccount and payeeData on transactions.
+     *
+     * @requirement REQ-004: OFX-aligned entity model
+     */
+    public function testWmmcPayeeDataAndBankAccount()
+    {
+        $filePath = $this->csvDir . '/Transaction History_Current Transactions 20260311.csv';
+
+        if (!file_exists($filePath) || filesize($filePath) === 0) {
+            $this->markTestSkipped("WMMC fixture not found");
+        }
+
+        $parser = new WmmcCsvParser();
+        $statement = $parser->parse($filePath);
+
+        // BankAccount should be CREDITLINE
+        $this->assertNotNull($statement->bankAccount, 'BankAccount should be populated');
+        $this->assertEquals(BankAccount::TYPE_CREDITLINE, $statement->bankAccount->accountType);
+        $this->assertNotEmpty($statement->bankAccount->accountId);
+
+        // Find a transaction with merchant address data (WAL-MART with city/state)
+        $found = false;
+        foreach ($statement->getTransactions() as $tx) {
+            if ($tx->payeeData !== null) {
+                $payee = $tx->getPayee();
+                $this->assertInstanceOf(Payee::class, $payee);
+                $this->assertNotNull($payee->name);
+
+                if ($payee->hasAddress()) {
+                    $found = true;
+                    $this->assertNotEmpty($payee->city);
+                    $this->assertNotEmpty($payee->state);
+                    break;
+                }
+            }
+        }
+        $this->assertTrue($found, 'At least one WMMC transaction should have structured address in payeeData');
+    }
+
+    /**
+     * Verify BCR parser populates BankAccount and defaultCurrency.
+     *
+     * @requirement REQ-004: OFX-aligned entity model
+     */
+    public function testBcrBankAccountAndCurrency()
+    {
+        $filePath = $this->csvDir . '/statement_ro_bcr_csv.csv';
+
+        if (!file_exists($filePath) || filesize($filePath) === 0) {
+            $this->markTestSkipped("BCR fixture not found");
+        }
+
+        $parser = new BcrCsvParser();
+        $statement = $parser->parse($filePath);
+
+        $this->assertNotNull($statement->bankAccount, 'BCR BankAccount should be populated');
+        $this->assertNotEmpty($statement->bankAccount->accountId);
+        $this->assertNotNull($statement->defaultCurrency, 'BCR defaultCurrency should be populated');
+        $this->assertNotEmpty((string)$statement->defaultCurrency);
+    }
+
+    /**
+     * Verify RBC parser populates BankAccount as SAVINGS.
+     *
+     * @requirement REQ-004: OFX-aligned entity model
+     */
+    public function testRbcBankAccount()
+    {
+        $filePath = $this->csvDir . '/20260311 RBC HISA download-transactions.csv';
+
+        if (!file_exists($filePath) || filesize($filePath) === 0) {
+            $this->markTestSkipped("RBC fixture not found");
+        }
+
+        $parser = new RbcCsvParser();
+        $statement = $parser->parse($filePath);
+
+        $this->assertNotNull($statement->bankAccount, 'RBC BankAccount should be populated');
+        $this->assertEquals(BankAccount::TYPE_SAVINGS, $statement->bankAccount->accountType);
     }
 }

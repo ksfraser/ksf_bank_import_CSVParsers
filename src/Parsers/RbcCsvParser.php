@@ -12,6 +12,7 @@ namespace Parsers\Parsers;
 
 use Parsers\Entities\Statement;
 use Parsers\Entities\Transaction;
+use Parsers\Entities\BankAccount;
 
 class RbcCsvParser extends GenericCsvParser
 {
@@ -54,6 +55,7 @@ class RbcCsvParser extends GenericCsvParser
 
             if ($property === 'accountNumber' && empty($statement->accountNumber) && !empty($txData[$property])) {
                 $statement->accountNumber = $txData[$property];
+                $this->populateBankAccount($statement, $txData[$property]);
             }
         }
 
@@ -76,5 +78,21 @@ class RbcCsvParser extends GenericCsvParser
         if ($value === null || trim($value) === '') return null;
         $clean = preg_replace('/[^0-9\.\-]/', '', $value);
         return (float)$clean;
+    }
+
+    /**
+     * RBC accounts are typically savings or chequing.
+     * The "Account Type" column is mapped to category, so we derive from it.
+     *
+     * @inheritdoc
+     */
+    protected function populateBankAccount(Statement $statement, string $accountId): void
+    {
+        if ($statement->bankAccount === null) {
+            $statement->bankAccount = new BankAccount([
+                'accountId'   => $accountId,
+                'accountType' => BankAccount::TYPE_SAVINGS,
+            ]);
+        }
     }
 }

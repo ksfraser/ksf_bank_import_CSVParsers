@@ -146,7 +146,6 @@ abstract class GenericCsvParser
      */
     protected function processRow(array $data, Statement $statement): void
     {
-        error_log("PROCESS ROW: " . implode('|', $data));
         $txData = [];
         $addressParts = [];
         $payeeFields = [];
